@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-// import Blog from './components/Blog'
+import Blog from "./components/Blog";
 import blogService from "./services/blog";
 import Notification from "./components/Notification";
 import loginService from "./services/login";
@@ -20,10 +20,6 @@ const App = () => {
   }, []);
 
   // ...
-
-  const handleBlogChange = (e) => {
-    setNewBlog(e.target.value);
-  };
 
   const handleLogin = async (event) => {
     event.preventDefault();
@@ -46,6 +42,7 @@ const App = () => {
 
   const loginForm = () => (
     <form onSubmit={handleLogin}>
+      <h1>log in to application</h1>
       <div>
         username
         <input
@@ -69,24 +66,19 @@ const App = () => {
   );
 
   const blogForm = () => (
-    <form onSubmit={(e) => e.preventDefault()}>
-      <input value={newBlog} onChange={handleBlogChange} />
-      <button type="submit">save</button>
-    </form>
+    <div>
+      <h1>blogs</h1>
+      <p>{user.name} logged in</p>
+      {blogs.map((blog) => (
+        <Blog key={blog.id} blog={blog} />
+      ))}
+    </div>
   );
 
   return (
     <div>
-      <h1>log in to application</h1>
       <Notification message={errorMessage} />
-      {user === null ? (
-        loginForm()
-      ) : (
-        <div>
-          <p>{user.name} logged-in</p>
-          {blogForm()}
-        </div>
-      )}
+      {user === null ? loginForm() : <div>{blogForm()}</div>}
       <div>
         <button onClick={() => setShowAll(!showAll)}>
           login {showAll ? "important" : "all"}
