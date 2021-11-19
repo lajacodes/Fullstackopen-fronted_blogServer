@@ -6,7 +6,7 @@ import loginService from "./services/login";
 
 const App = () => {
   const [blogs, setBlog] = useState([]);
-  const [newBlog, setNewBlog] = useState("");
+  // const [newBlog, setNewBlog] = useState("");
   const [showAll, setShowAll] = useState(true);
   const [errorMessage, setErrorMessage] = useState(null);
   const [username, setUsername] = useState("");
@@ -14,12 +14,23 @@ const App = () => {
   const [user, setUser] = useState(null);
 
   useEffect(() => {
-    blogService.getAll().then((initialNotes) => {
-      setBlog(initialNotes);
+    blogService.getAll().then((initialBlogs) => {
+      setBlog(initialBlogs);
     });
   }, []);
 
-  // ...
+  useEffect(() => {
+    const loggedUserJSON = window.localStorage.getItem("loggedBlogappUser");
+    if (loggedUserJSON) {
+      const user = JSON.parse(loggedUserJSON);
+      setUser(user);
+      blogService.setToken(user.token);
+    }
+  }, []);
+
+  const handleLogout = (e) => {
+    return window.localStorage.removeItem("loggedBlogappUser");
+  };
 
   const handleLogin = async (event) => {
     event.preventDefault();
@@ -29,6 +40,8 @@ const App = () => {
         username,
         password,
       });
+      window.localStorage.setItem("loggedBlogappUser", JSON.stringify(user));
+      blogService.setToken(user.token);
       setUser(user);
       setUsername("");
       setPassword("");
@@ -68,7 +81,11 @@ const App = () => {
   const blogForm = () => (
     <div>
       <h1>blogs</h1>
-      <p>{user.name} logged in</p>
+      <form onSubmit={handleLogout}>
+        {user.name} logged in
+        <button>logout</button>
+      </form>
+
       {blogs.map((blog) => (
         <Blog key={blog.id} blog={blog} />
       ))}
